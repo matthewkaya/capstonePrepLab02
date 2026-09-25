@@ -61,6 +61,19 @@ def group_temperatures_by_day(records):
 
     return daily_temperatures
 
+def calculate_daily_temperature_summary(daily_temperatures):
+    """Calculate minimum, maximum, and mean temperature for each day."""
+    summary = {}
+
+    for date, temperatures in daily_temperatures.items():
+        summary[date] = {
+            "min_temperature": min(temperatures),
+            "max_temperature": max(temperatures),
+            "mean_temperature": round(sum(temperatures) / len(temperatures), 2)
+        }
+
+    return summary
+
 def main():
     data = fetch_records(SOURCE_URL)
 
@@ -69,13 +82,13 @@ def main():
 
     records = build_hourly_records(data)
     daily_temperatures = group_temperatures_by_day(records)
+    temperature_summary = calculate_daily_temperature_summary(daily_temperatures)
 
     print("Number of hourly records:", len(records))
     print("Number of days:", len(daily_temperatures))
 
-    for date, temperatures in daily_temperatures.items():
-        print(date, temperatures)
-
+    for date, values in temperature_summary.items():
+        print(date, values)
 
 if __name__ == "__main__":
     main()
