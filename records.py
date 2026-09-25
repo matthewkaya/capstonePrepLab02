@@ -28,15 +28,41 @@ def fetch_records(url):
 
 
 def build_hourly_records(data):
-
     """Combine hourly weather lists into a list of weather records."""
 
-    times = data["hourly"]["time"]
-    temperatures = data["hourly"]["temperature_2m"]
-    precipitation = data["hourly"]["precipitation"]
+    try:
+        times = data["hourly"]["time"]
+        temperatures = data["hourly"]["temperature_2m"]
+        precipitation = data["hourly"]["precipitation"]
+    except (KeyError, TypeError):
+        print("Weather data is missing required hourly fields.")
+        return None
+
+    if (
+        len(times) != len(temperatures)
+        or len(times) != len(precipitation)
+    ):
+        print("Weather data lists have different lengths.")
+        return None
+
     records = []
 
-    for time, temperature, rain in zip(times, temperatures, precipitation):
+    for time, temperature, rain in zip(
+        times, temperatures, precipitation
+    ):
+        if not isinstance(time, str):
+            continue
+
+        if temperature is not None and not isinstance(
+            temperature, (int, float)
+        ):
+            continue
+
+        if rain is not None and not isinstance(
+            rain, (int, float)
+        ):
+            continue
+
         record = {
             "time": time,
             "temperature": temperature,
@@ -152,10 +178,17 @@ def main():
         return
 
     records = build_hourly_records(data)
+
+    if records is None or len(records) == 0:
+        print("No valid weather records to process.")
+        return
+
     summary = build_summary(records)
 
     write_summary(summary, OUTPUT)
     print("Weather summary written to summary.json.")
-    
+
+
 if __name__ == "__main__":
     main()
+    
