@@ -91,6 +91,20 @@ def calculate_daily_precipitation(records):
 
     return daily_precipitation
 
+def find_warmest_day(temperature_summary):
+    """Return the day with the highest maximum temperature."""
+    max_temperatures = {
+        date: values["max_temperature"]
+        for date, values in temperature_summary.items()
+    }
+
+    warmest_day = max(max_temperatures, key=max_temperatures.get)
+
+    return {
+        "date": warmest_day,
+        "temperature": max_temperatures[warmest_day]
+    }  
+
 def main():
     data = fetch_records(SOURCE_URL)
 
@@ -100,11 +114,14 @@ def main():
     records = build_hourly_records(data)
 
     daily_temperatures = group_temperatures_by_day(records)
+
     temperature_summary = calculate_daily_temperature_summary(
         daily_temperatures
     )
 
     daily_precipitation = calculate_daily_precipitation(records)
+
+    warmest_day = find_warmest_day(temperature_summary)
 
     print("Number of hourly records:", len(records))
     print("Number of days:", len(daily_temperatures))
@@ -117,5 +134,9 @@ def main():
     for date, total in daily_precipitation.items():
         print(date, round(total, 2))
 
+    print("\nWarmest day:")
+    print(warmest_day)
+
+    
 if __name__ == "__main__":
     main()
