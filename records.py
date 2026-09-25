@@ -1,5 +1,7 @@
-import requests
+import json
+from pathlib import Path
 
+import requests
 
 SOURCE_URL = (
     "https://api.open-meteo.com/v1/forecast"
@@ -10,6 +12,8 @@ SOURCE_URL = (
     "&forecast_days=0"
     "&timezone=America/Toronto"
 )
+
+OUTPUT = Path("summary.json")
 
 
 def fetch_records(url):
@@ -115,6 +119,32 @@ def get_unique_dates(records):
 
     return unique_dates
 
+def build_summary(records):
+    """Build the final weather summary dictionary."""
+    daily_temperatures = group_temperatures_by_day(records)
+    temperature_summary = calculate_daily_temperature_summary(
+        daily_temperatures
+    )
+    daily_precipitation = calculate_daily_precipitation(records)
+    warmest_day = find_warmest_day(temperature_summary)
+    unique_dates = get_unique_dates(records)
+
+    summary = {
+        "source_url": SOURCE_URL,
+        "records_processed": len(records),
+        "unique_days": len(unique_dates),
+        "daily_temperature_summary": temperature_summary,
+        "daily_precipitation": daily_precipitation,
+        "warmest_day": warmest_day
+    }
+
+    return summary
+
+def write_summary(summary, path):
+    """Write the summary dictionary to a JSON file."""
+    with path.open("w", encoding="utf-8") as file:
+        json.dump(summary, file, indent=2)
+
 def main():
     data = fetch_records(SOURCE_URL)
 
@@ -135,21 +165,21 @@ def main():
 
     unique_dates = get_unique_dates(records)
 
-    print("Number of hourly records:", len(records))
-    print("Number of unique days:", len(unique_dates))
-    print("Unique dates:", sorted(unique_dates))
+    # Debug output
+    # print("Number of hourly records:", len(records))
+    # print("Number of unique days:", len(unique_dates))
+    # print("Unique dates:", sorted(unique_dates))
 
-    for date, values in temperature_summary.items():
-        print(date, values)
+    # print("\nDaily temperature summary:")
+    # for date, values in temperature_summary.items():
+    #     print(date, values)
 
-    print("\nDaily precipitation:")
+    # print("\nDaily precipitation:")
+    # for date, total in daily_precipitation.items():
+    #     print(date, round(total, 2))
 
-    for date, total in daily_precipitation.items():
-        print(date, round(total, 2))
-
-    print("\nWarmest day:")
-    print(warmest_day)
-
+    # print("\nWarmest day:")
+    # print(warmest_day)
     
 if __name__ == "__main__":
     main()
