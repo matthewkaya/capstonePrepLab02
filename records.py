@@ -22,14 +22,46 @@ def fetch_records(url):
         print("Unable to download weather data.")
         return None
 
+def build_hourly_records(data):
+
+    """Combine hourly weather lists into a list of weather records."""
+
+    times = data["hourly"]["time"]
+
+    temperatures = data["hourly"]["temperature_2m"]
+
+    precipitation = data["hourly"]["precipitation"]
+
+    records = []
+
+    for time, temperature, rain in zip(times, temperatures, precipitation):
+
+        record = {
+
+            "time": time,
+
+            "temperature": temperature,
+
+            "precipitation": rain
+
+        }
+
+        records.append(record)
+
+    return records
 
 def main():
+
     data = fetch_records(SOURCE_URL)
 
     if data is None:
         return
 
-    print("Weather data downloaded successfully.")
+    records = build_hourly_records(data)
+
+    print("Number of hourly records:", len(records))
+    print("First record:", records[0])
+    print("Last record:", records[-1])
 
 
 if __name__ == "__main__":
