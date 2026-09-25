@@ -152,34 +152,10 @@ def main():
         return
 
     records = build_hourly_records(data)
+    summary = build_summary(records)
 
-    daily_temperatures = group_temperatures_by_day(records)
-
-    temperature_summary = calculate_daily_temperature_summary(
-        daily_temperatures
-    )
-
-    daily_precipitation = calculate_daily_precipitation(records)
-
-    warmest_day = find_warmest_day(temperature_summary)
-
-    unique_dates = get_unique_dates(records)
-
-    # Debug output
-    # print("Number of hourly records:", len(records))
-    # print("Number of unique days:", len(unique_dates))
-    # print("Unique dates:", sorted(unique_dates))
-
-    # print("\nDaily temperature summary:")
-    # for date, values in temperature_summary.items():
-    #     print(date, values)
-
-    # print("\nDaily precipitation:")
-    # for date, total in daily_precipitation.items():
-    #     print(date, round(total, 2))
-
-    # print("\nWarmest day:")
-    # print(warmest_day)
+    write_summary(summary, OUTPUT)
+    print("Weather summary written to summary.json.")
     
 if __name__ == "__main__":
     main()
