@@ -5,6 +5,12 @@ This project downloads hourly weather data from Open-Meteo API for Toronto and m
 
 ## Data source
 
+API URL:
+
+https://api.open-meteo.com/v1/forecast?latitude=43.65&longitude=-79.38&hourly=temperature_2m,precipitation&past_days=7&forecast_days=0&timezone=America/Toronto
+
+Each hourly record represents one hour of temperature and precipitation data.
+
 Open-Meteo public weather API is used.
 
 The program gets temperature and precipitation data for past 7 days. It normally processes 168 hourly records.
