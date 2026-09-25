@@ -105,6 +105,16 @@ def find_warmest_day(temperature_summary):
         "temperature": max_temperatures[warmest_day]
     }  
 
+def get_unique_dates(records):
+    """Return the unique dates found in the weather records."""
+    unique_dates = set()
+
+    for record in records:
+        date = record["time"].split("T")[0]
+        unique_dates.add(date)
+
+    return unique_dates
+
 def main():
     data = fetch_records(SOURCE_URL)
 
@@ -123,8 +133,11 @@ def main():
 
     warmest_day = find_warmest_day(temperature_summary)
 
+    unique_dates = get_unique_dates(records)
+
     print("Number of hourly records:", len(records))
-    print("Number of days:", len(daily_temperatures))
+    print("Number of unique days:", len(unique_dates))
+    print("Unique dates:", sorted(unique_dates))
 
     for date, values in temperature_summary.items():
         print(date, values)
