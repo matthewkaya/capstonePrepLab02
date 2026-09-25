@@ -74,6 +74,23 @@ def calculate_daily_temperature_summary(daily_temperatures):
 
     return summary
 
+def calculate_daily_precipitation(records):
+    """Calculate total precipitation for each day."""
+    daily_precipitation = {}
+
+    for record in records:
+        date = record["time"].split("T")[0]
+        precipitation = record["precipitation"]
+
+        if precipitation is None:
+            continue
+
+        daily_precipitation[date] = (
+            daily_precipitation.get(date, 0) + precipitation
+        )
+
+    return daily_precipitation
+
 def main():
     data = fetch_records(SOURCE_URL)
 
@@ -81,14 +98,24 @@ def main():
         return
 
     records = build_hourly_records(data)
+
     daily_temperatures = group_temperatures_by_day(records)
-    temperature_summary = calculate_daily_temperature_summary(daily_temperatures)
+    temperature_summary = calculate_daily_temperature_summary(
+        daily_temperatures
+    )
+
+    daily_precipitation = calculate_daily_precipitation(records)
 
     print("Number of hourly records:", len(records))
     print("Number of days:", len(daily_temperatures))
 
     for date, values in temperature_summary.items():
         print(date, values)
+
+    print("\nDaily precipitation:")
+
+    for date, total in daily_precipitation.items():
+        print(date, round(total, 2))
 
 if __name__ == "__main__":
     main()
